@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: core-crm-config
+data:
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/core_crm"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_DATASOURCE_PASSWORD: "postgres"
+  SERVER_ADDRESS: "0.0.0.0"
+  APP_B_URL: "http://app-b:8081"

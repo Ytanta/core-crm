@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.29.xsd">
+
+    <changeSet id="1-create-tables" author="ytanta">
+        <!-- Таблица users -->
+        <createTable tableName="users" remarks="Пользователи системы">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(320)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="role" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Таблица buildings -->
+        <createTable tableName="buildings" remarks="Здания и сооружения">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="address" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="owner_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_building_owner"
+                             referencedTableName="users"
+                             referencedColumnNames="id"/>
+            </column>
+        </createTable>
+
+        <!-- Таблица tasks -->
+        <createTable tableName="tasks" remarks="Задачи системы">
+            <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="description" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="due_date" type="DATE"/>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_task_owner"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="manager_id" type="UUID">
+                <constraints nullable="true" foreignKeyName="fk_task_manager"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="buyer_id" type="UUID">
+                <constraints nullable="true" foreignKeyName="fk_task_buyer"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="building_id" type="UUID">
+                <constraints nullable="false" foreignKeyName="fk_task_building"
+                             referencedTableName="buildings" referencedColumnNames="id"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Таблица для ShedLock -->
+        <createTable tableName="shedlock" remarks="Таблица для ShedLock">
+            <column name="name" type="VARCHAR(64)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lock_until" type="TIMESTAMPTZ">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_at" type="TIMESTAMPTZ">
+                <constraints nullable="false"/>
+            </column>
+            <column name="locked_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Индексы -->
+        <createIndex tableName="users" indexName="idx_user_email">
+            <column name="email"/>
+        </createIndex>
+
+        <createIndex tableName="tasks" indexName="idx_task_owner">
+            <column name="owner_id"/>
+        </createIndex>
+
+        <createIndex tableName="tasks" indexName="idx_task_manager">
+            <column name="manager_id"/>
+        </createIndex>
+
+        <createIndex tableName="tasks" indexName="idx_task_buyer">
+            <column name="buyer_id"/>
+        </createIndex>
+
+        <createIndex tableName="tasks" indexName="idx_task_building">
+            <column name="building_id"/>
+        </createIndex>
+
+        <createIndex tableName="buildings" indexName="idx_building_owner">
+            <column name="owner_id"/>
+        </createIndex>
+        <createIndex indexName="idx_shedlock_lock_until" tableName="shedlock">
+            <column name="lock_until"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
